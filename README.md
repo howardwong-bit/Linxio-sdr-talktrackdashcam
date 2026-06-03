@@ -1,1 +1,549 @@
-# Linxio-sdr-talktrackdashcam
+[index.html](https://github.com/user-attachments/files/28541689/index.html)<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linxio — Vision 3.0 SDR Talk Track</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F4F5F7; color: #1a1a1a; font-size: 15px; }
+
+.topbar {
+  background: #0D1B3E; color: #fff;
+  padding: 12px 24px; display: flex; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 100;
+}
+.topbar .logo { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; opacity: 0.9; }
+.topbar .title { font-size: 14px; font-weight: 500; opacity: 0.7; }
+.topbar .divider { width: 1px; height: 16px; background: rgba(255,255,255,0.2); }
+
+.nav-strip {
+  background: #fff; border-bottom: 1px solid #e5e7eb;
+  padding: 10px 24px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  position: sticky; top: 45px; z-index: 99;
+}
+.nav-strip .nav-label { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 4px; }
+.nav-btn {
+  font-size: 12px; padding: 5px 12px; border-radius: 20px;
+  border: 1px solid #e5e7eb; background: #fff; color: #6b7280;
+  cursor: pointer; transition: all 0.15s; font-family: inherit;
+}
+.nav-btn:hover { background: #f9fafb; color: #111; border-color: #d1d5db; }
+.nav-btn.active { background: #0D1B3E; color: #fff; border-color: #0D1B3E; }
+
+.main { max-width: 780px; margin: 0 auto; padding: 28px 24px 80px; }
+
+.section { display: none; }
+.section.visible { display: block; }
+
+/* Cards */
+.card { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden; margin-bottom: 12px; }
+.card-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
+.card-body { padding: 14px 16px; font-size: 14px; line-height: 1.7; color: #374151; border-top: 1px solid #f3f4f6; }
+
+/* Overview grid */
+.overview-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.overview-card {
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 12px;
+  padding: 16px; cursor: pointer; transition: all 0.15s;
+}
+.overview-card:hover { border-color: #146CE8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+.overview-card .oc-step { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.overview-card .oc-title { font-size: 14px; font-weight: 600; color: #111; margin-bottom: 5px; }
+.overview-card .oc-desc { font-size: 12px; color: #6b7280; line-height: 1.6; }
+.overview-card .oc-cta { font-size: 12px; color: #146CE8; margin-top: 10px; font-weight: 500; }
+
+.overview-half { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.overview-small { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; }
+.overview-small:hover { border-color: #146CE8; }
+.overview-small .os-title { font-size: 14px; font-weight: 600; color: #111; margin-bottom: 4px; }
+.overview-small .os-desc { font-size: 12px; color: #6b7280; }
+
+/* Purpose box */
+.purpose-box {
+  background: #EBF3FD; border: 1px solid #BFDBFE; border-radius: 12px;
+  padding: 16px 18px; margin-bottom: 16px;
+}
+.purpose-box .pb-label { font-size: 11px; font-weight: 600; color: #1d4ed8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.purpose-box p { font-size: 14px; color: #1e3a5f; line-height: 1.7; margin-bottom: 5px; }
+.purpose-box p:last-child { margin-bottom: 0; }
+
+/* Section header */
+.section-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #0D1B3E; }
+.step-badge { font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; background: #0D1B3E; color: #fff; text-transform: uppercase; letter-spacing: 0.05em; }
+.section-hdr h2 { font-size: 16px; font-weight: 600; color: #0D1B3E; }
+
+.section-hdr.green { border-bottom-color: #1D9E75; }
+.section-hdr.green h2 { color: #0F6E56; }
+.section-hdr.green .step-badge { background: #1D9E75; }
+
+.section-hdr.blue { border-bottom-color: #146CE8; }
+.section-hdr.blue h2 { color: #185FA5; }
+.section-hdr.blue .step-badge { background: #146CE8; }
+
+.section-hdr.red { border-bottom-color: #dc2626; }
+.section-hdr.red h2 { color: #991b1b; }
+.section-hdr.red .step-badge { background: #dc2626; }
+
+.section-hdr.gold { border-bottom-color: #B08010; }
+.section-hdr.gold h2 { color: #92400e; }
+
+/* Script box */
+.script-box {
+  background: #F8FAFC; border-left: 3px solid #146CE8;
+  border-radius: 0 10px 10px 0; padding: 14px 16px; margin-bottom: 12px;
+}
+.script-box p { font-size: 14px; line-height: 1.75; color: #1e293b; margin-bottom: 8px; }
+.script-box p:last-child { margin-bottom: 0; }
+.script-box .pause { font-size: 12px; color: #94a3b8; font-style: italic; margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
+
+.script-box.green { border-left-color: #1D9E75; }
+.script-box.blue { border-left-color: #146CE8; }
+.script-box.gold { border-left-color: #B08010; background: #FFFBEB; }
+.script-box.red { border-left-color: #dc2626; background: #FEF2F2; }
+
+/* Branch cards */
+.branch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.branch-card {
+  border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;
+  cursor: pointer; transition: all 0.15s;
+}
+.branch-card:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+.branch-card.full { grid-column: 1 / -1; }
+.bh { padding: 10px 14px; display: flex; align-items: center; gap: 8px; }
+.bh span { font-size: 13px; font-weight: 600; }
+.bh .icon { font-size: 16px; }
+.bb { padding: 10px 14px; font-size: 13px; color: #6b7280; line-height: 1.6; background: #fff; }
+.bfoot { padding: 8px 14px; font-size: 12px; font-weight: 500; background: #f9fafb; border-top: 1px solid #f3f4f6; color: #6b7280; display: flex; align-items: center; gap: 4px; }
+
+.bc-yes .bh { background: #ECFDF5; color: #065f46; }
+.bc-no .bh { background: #EFF6FF; color: #1e40af; }
+.bc-issue .bh { background: #FEF2F2; color: #991b1b; }
+
+/* Listen box */
+.listen-box { border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
+.listen-box .ll { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+.keywords { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.kpill { font-size: 12px; padding: 3px 10px; border-radius: 20px; border: 1px solid currentColor; font-weight: 500; }
+.listen-box .lt { font-size: 13px; line-height: 1.6; }
+
+.lb-green { background: #ECFDF5; }
+.lb-green .ll { color: #065f46; }
+.lb-green .kpill { color: #059669; background: #fff; }
+
+.lb-blue { background: #EFF6FF; }
+.lb-blue .ll { color: #1e40af; }
+.lb-blue .kpill { color: #2563eb; background: #fff; }
+
+/* Sub nav */
+.sub-nav { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+.sub-btn {
+  font-size: 12px; padding: 6px 14px; border-radius: 20px;
+  border: 1px solid #e5e7eb; background: #fff; color: #6b7280;
+  cursor: pointer; transition: all 0.15s; font-family: inherit;
+}
+.sub-btn:hover { background: #f9fafb; }
+.sub-btn.s-green.act { background: #ECFDF5; color: #065f46; border-color: #1D9E75; font-weight: 600; }
+.sub-btn.s-blue.act { background: #EFF6FF; color: #1e40af; border-color: #146CE8; font-weight: 600; }
+.sub-btn.s-red.act { background: #FEF2F2; color: #991b1b; border-color: #dc2626; font-weight: 600; }
+
+.sub-section { display: none; }
+.sub-section.visible { display: block; }
+
+/* Outcomes */
+.outcomes-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.oc { border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden; }
+.oc-hd { padding: 10px 14px; font-size: 12px; font-weight: 600; }
+.oc-bd { padding: 12px 14px; font-size: 13px; color: #4b5563; line-height: 1.7; background: #fff; }
+.oc1 .oc-hd { background: #1D9E75; color: #fff; }
+.oc2 .oc-hd { background: #146CE8; color: #fff; }
+.oc3 .oc-hd { background: #dc2626; color: #fff; }
+
+/* Objection table */
+.obj-table { width: 100%; border-collapse: collapse; font-size: 14px; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; }
+.obj-table thead th { padding: 10px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; text-align: left; background: #f9fafb; border-bottom: 1px solid #e5e7eb; font-weight: 600; }
+.obj-table tbody td { padding: 12px 14px; vertical-align: top; border-bottom: 1px solid #f3f4f6; line-height: 1.65; }
+.obj-table tbody tr:last-child td { border-bottom: none; }
+.obj-table tbody td:first-child { font-weight: 600; color: #111; width: 32%; }
+.obj-table tbody td:last-child { color: #4b5563; }
+.obj-table tbody tr:nth-child(even) td { background: #fafafa; }
+
+/* Rules */
+.rules-list { list-style: none; }
+.rules-list li { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; background: #FFFBEB; border-radius: 10px; margin-bottom: 8px; font-size: 14px; line-height: 1.65; border: 1px solid #FDE68A; }
+.rules-list li .ri { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.rules-list li strong { color: #92400e; }
+.rules-list li span { color: #78350f; }
+
+/* Retention box */
+.retention-box { background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
+.retention-box .rl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #991b1b; margin-bottom: 8px; }
+.retention-box p { font-size: 14px; line-height: 1.7; color: #7f1d1d; margin-bottom: 6px; }
+.retention-box p:last-child { margin-bottom: 0; }
+
+/* Info row */
+.info-row { background: #f8fafc; border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #4b5563; line-height: 1.7; border: 1px solid #e5e7eb; margin-bottom: 12px; }
+
+/* Sub label */
+.sub-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #f3f4f6; }
+.sl-green { color: #065f46; border-bottom-color: #a7f3d0; }
+.sl-blue { color: #1e40af; border-bottom-color: #bfdbfe; }
+.sl-grey { color: #6b7280; border-bottom-color: #f3f4f6; }
+
+.divider { height: 1px; background: #f3f4f6; margin: 18px 0; }
+.back-btn { background: none; border: none; font-size: 12px; color: #6b7280; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 14px; font-family: inherit; padding: 0; }
+.back-btn:hover { color: #111; }
+
+/* Email template */
+.email-box { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+.email-subject { padding: 12px 16px; background: #f9fafb; border-bottom: 1px solid #e5e7eb; font-size: 13px; font-weight: 600; color: #374151; }
+.email-body { padding: 16px; font-size: 13px; line-height: 1.8; color: #374151; }
+.email-body p { margin-bottom: 10px; }
+.email-body p:last-child { margin-bottom: 0; }
+
+.tag-pill { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; margin-left: 6px; vertical-align: middle; }
+.tp-green { background: #ECFDF5; color: #065f46; }
+.tp-blue { background: #EFF6FF; color: #1e40af; }
+.tp-red { background: #FEF2F2; color: #991b1b; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="logo">LINXIO</span>
+  <span class="divider"></span>
+  <span class="title">Vision 3.0 — SDR Talk Track</span>
+</div>
+
+<nav class="nav-strip">
+  <span class="nav-label">Go to</span>
+  <button class="nav-btn active" onclick="showSection('overview')">Overview</button>
+  <button class="nav-btn" onclick="showSection('step1')">Step 1 — Opening</button>
+  <button class="nav-btn" onclick="showSection('step2')">Step 2 — Branch</button>
+  <button class="nav-btn" onclick="showSection('step3')">Step 3 — Outcomes</button>
+  <button class="nav-btn" onclick="showSection('objections')">Objections</button>
+  <button class="nav-btn" onclick="showSection('rules')">Golden rules</button>
+  <button class="nav-btn" onclick="showSection('email')">Email templates</button>
+</nav>
+
+<div class="main">
+
+  <!-- OVERVIEW -->
+  <div id="overview" class="section visible">
+    <div class="purpose-box">
+      <div class="pb-label">Purpose of this call</div>
+      <p>You are not closing a deal. You are starting a conversation.</p>
+      <p>Goal: qualify interest, understand the customer's current situation, and warm-transfer to Howard for the close.</p>
+      <p>Every call must end with one of three logged outcomes — see Step 3.</p>
+    </div>
+
+    <div class="overview-grid">
+      <div class="overview-card" onclick="showSection('step1')">
+        <div class="oc-step">Step 1</div>
+        <div class="oc-title">The opening</div>
+        <div class="oc-desc">Verbatim script. Speak slowly. Gap-first framing.</div>
+        <div class="oc-cta">→ Go to Step 1</div>
+      </div>
+      <div class="overview-card" onclick="showSection('step2')">
+        <div class="oc-step">Step 2</div>
+        <div class="oc-title">Listen and branch</div>
+        <div class="oc-desc">Branch A, B, or C depending on what you hear.</div>
+        <div class="oc-cta">→ Go to Step 2</div>
+      </div>
+      <div class="overview-card" onclick="showSection('step3')">
+        <div class="oc-step">Step 3</div>
+        <div class="oc-title">Close and log</div>
+        <div class="oc-desc">Every call = one logged outcome. No exceptions.</div>
+        <div class="oc-cta">→ Go to Step 3</div>
+      </div>
+    </div>
+
+    <div class="overview-half">
+      <div class="overview-small" onclick="showSection('objections')">
+        <div class="os-title">💬 Objection handlers</div>
+        <div class="os-desc">5 common deflections with exact wording.</div>
+      </div>
+      <div class="overview-small" onclick="showSection('rules')">
+        <div class="os-title">⭐ Golden rules</div>
+        <div class="os-desc">5 non-negotiables before your first call.</div>
+      </div>
+      <div class="overview-small" onclick="showBranch('A')">
+        <div class="os-title" style="color:#065f46;">Branch A — Have dashcams</div>
+        <div class="os-desc">Happy vs. wish they did more.</div>
+      </div>
+      <div class="overview-small" onclick="showBranch('B')">
+        <div class="os-title" style="color:#1e40af;">Branch B — No dashcams</div>
+        <div class="os-desc">Plant the gap before pitching anything.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step1" class="section">
+    <button class="back-btn" onclick="showSection('overview')">← Overview</button>
+    <div class="section-hdr">
+      <span class="step-badge">Step 1</span>
+      <h2>The opening script</h2>
+    </div>
+    <p style="font-size:13px; color:#94a3b8; font-style:italic; margin-bottom:14px;">Read this exactly. Speak slowly. Pause after the final question.</p>
+
+    <div class="script-box">
+      <p>"Hey [Customer Name], it's [Your Name] here from Linxio."</p>
+      <p>"Quick call, I promise."</p>
+      <p>"I'm reaching out because I noticed you're currently using our GPS tracking devices, yet I don't see any dashcams on your current system."</p>
+      <p>"Just curious — do you have dashcams already?"</p>
+      <div class="pause">⏸ Pause — let them answer. Do not fill the silence.</div>
+    </div>
+
+    <p style="font-size:13px; color:#6b7280; margin-bottom:10px; margin-top:16px;">Once they respond, go to:</p>
+    <div class="branch-grid">
+      <div class="branch-card bc-yes" onclick="showBranch('A')">
+        <div class="bh"><span class="icon">✓</span><span>YES — they have dashcams</span></div>
+        <div class="bb">Ask if they're happy, or wish the dashcams did more.</div>
+        <div class="bfoot">→ Branch A</div>
+      </div>
+      <div class="branch-card bc-no" onclick="showBranch('B')">
+        <div class="bh"><span class="icon">✕</span><span>NO — no dashcams</span></div>
+        <div class="bb">Plant the gap before talking product or price.</div>
+        <div class="bfoot">→ Branch B</div>
+      </div>
+      <div class="branch-card bc-issue full" onclick="showBranch('C')">
+        <div class="bh"><span class="icon">⚠</span><span>They raise a complaint or issue</span></div>
+        <div class="bb">Retention moment — do not rush past it.</div>
+        <div class="bfoot">→ Branch C</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step2" class="section">
+    <button class="back-btn" onclick="showSection('overview')">← Overview</button>
+    <div class="section-hdr">
+      <span class="step-badge">Step 2</span>
+      <h2>Listen and branch</h2>
+    </div>
+
+    <div class="sub-nav">
+      <button class="sub-btn s-green act" id="btn-A" onclick="showSubSection('branchA','A')">Branch A — Have dashcams</button>
+      <button class="sub-btn s-blue" id="btn-B" onclick="showSubSection('branchB','B')">Branch B — No dashcams</button>
+      <button class="sub-btn s-red" id="btn-C" onclick="showSubSection('branchC','C')">Branch C — Complaint</button>
+    </div>
+
+    <div id="branchA" class="sub-section visible">
+      <p style="font-size:13px;color:#4b5563;margin-bottom:12px;">First ask: <em>"Are you happy with them, or is there anything they don't quite do that you wish they could?"</em></p>
+      <div class="divider"></div>
+      <div class="sub-label sl-green">A1 — Happy with their dashcams</div>
+      <div class="script-box green">
+        <p>"That's great. While I've got you — is there anything on the GPS side that you've been wishing worked differently?"</p>
+      </div>
+      <div class="listen-box lb-green">
+        <div class="ll">👂 Listen for</div>
+        <div class="keywords">
+          <span class="kpill">Geofencing</span>
+          <span class="kpill">Driving behaviour</span>
+          <span class="kpill">Servicing / maintenance</span>
+          <span class="kpill">Reporting</span>
+        </div>
+        <div class="lt"><span class="tag-pill tp-green">Upsell signal</span> Flag for Howard — plan upgrade or add-on opportunity.<br>If nothing surfaces: <em>"Perfect, good to know. I'll let you get back to it."</em></div>
+      </div>
+      <div class="divider"></div>
+      <div class="sub-label sl-blue">A2 — Wish their dashcams did more</div>
+      <div class="listen-box lb-blue">
+        <div class="ll">👂 Listen for</div>
+        <div class="keywords">
+          <span class="kpill">Live streaming</span>
+          <span class="kpill">Side / rear cameras</span>
+          <span class="kpill">Hard to pull footage</span>
+          <span class="kpill">Can't review remotely</span>
+        </div>
+        <div class="lt"><span class="tag-pill tp-blue">Close signal</span> Move to the handoff script below.</div>
+      </div>
+      <div class="script-box blue">
+        <p>"That's actually exactly why I called."</p>
+        <p>"We've got a live-streaming AI dashcam that integrates directly into the Linxio platform you're already using — so everything is in one place. No switching between systems."</p>
+        <p>"I don't want to give you a half-answer on the details. My colleague Howard specialises in this and could give you a quick call later today. Would that work?"</p>
+      </div>
+      <p style="font-size:13px;color:#6b7280;">→ Go to <strong onclick="showSection('step3')" style="cursor:pointer;color:#146CE8;">Step 3</strong> and log: Outcome 1 — Booked Callback</p>
+    </div>
+
+    <div id="branchB" class="sub-section">
+      <p style="font-size:13px;color:#4b5563;margin-bottom:12px;">Do <strong>NOT</strong> jump to price. Plant the gap first.</p>
+      <div class="script-box blue">
+        <p>"When an accident happens, or a complaint comes in about a driver — how do you handle that at the moment?"</p>
+        <div class="pause">⏸ Wait for their answer. This is your most important moment.</div>
+      </div>
+      <div class="divider"></div>
+      <div class="sub-label sl-blue">If they describe a pain or gap</div>
+      <div class="script-box blue">
+        <p>"Yeah, that's exactly what we're hearing from a lot of other customers as well."</p>
+        <p>"Our live-stream AI dashcams integrate directly into the Linxio platform you're already on — GPS and camera footage in one place."</p>
+        <p>"My colleague Howard can walk you through it properly. Would a quick call later today or tomorrow work?"</p>
+      </div>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:16px;">→ Log: <strong>Outcome 1 — Booked Callback</strong></p>
+      <div class="divider"></div>
+      <div class="sub-label sl-grey">If they seem indifferent</div>
+      <div class="script-box gold">
+        <p>"Fair enough. If anything changes or an incident comes up, we're here."</p>
+        <p>"Let me send you a quick overview so you've got it on file."</p>
+        <p style="font-size:12px;color:#92400e;font-style:italic;">[ Send Vision 3.0 brochure. ]</p>
+      </div>
+      <p style="font-size:13px;color:#6b7280;">→ Log: <strong>Outcome 2 — Sent Collateral</strong></p>
+    </div>
+
+    <div id="branchC" class="sub-section">
+      <div class="retention-box">
+        <div class="rl">⚠ Retention moment — do not rush past this</div>
+        <p>"I'm really glad you mentioned that — I want to make sure that gets sorted for you."</p>
+        <p>"Can I grab a few quick notes and get the right person to follow up with you today?"</p>
+        <p style="font-size:12px;font-style:italic;color:#991b1b;">[ Take notes: issue type, vehicles affected, urgency ]</p>
+      </div>
+      <div class="info-row">
+        <strong>Next step:</strong> Email <a href="mailto:support@linxio.com" style="color:#146CE8;">support@linxio.com</a> and CC <a href="mailto:howard.wong@linxio.com" style="color:#146CE8;">howard.wong@linxio.com</a><br>
+        State the issue clearly in the body. Howard will take it from there depending on severity.
+      </div>
+      <p style="font-size:13px;color:#6b7280;">→ Log: <strong>Outcome 3 — Issue Flagged</strong></p>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div id="step3" class="section">
+    <button class="back-btn" onclick="showSection('overview')">← Overview</button>
+    <div class="section-hdr">
+      <span class="step-badge">Step 3</span>
+      <h2>Close and log the outcome</h2>
+    </div>
+    <p style="font-size:13px;color:#94a3b8;font-style:italic;margin-bottom:16px;">Every call must end with ONE of these three outcomes logged. No exceptions.</p>
+    <div class="outcomes-grid">
+      <div class="oc oc1">
+        <div class="oc-hd">✅ Outcome 1: Booked callback</div>
+        <div class="oc-bd">Customer agreed to speak further.<br><br>Log: name, number, best time to call, and key pain or interest heard.</div>
+      </div>
+      <div class="oc oc2">
+        <div class="oc-hd">📧 Outcome 2: Sent collateral</div>
+        <div class="oc-bd">Customer indifferent but didn't say no.<br><br>Send Vision 3.0 PDF. Log as Sent Collateral.<br><br>Schedule a 2-week follow-up task.</div>
+      </div>
+      <div class="oc oc3">
+        <div class="oc-hd">⚠ Outcome 3: Issue flagged</div>
+        <div class="oc-bd">Customer raised an issue or complaint.<br><br>Email support and CC howard.wong@linxio.com. Log issue. Mark high priority.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OBJECTIONS -->
+  <div id="objections" class="section">
+    <button class="back-btn" onclick="showSection('overview')">← Overview</button>
+    <div class="section-hdr gold">
+      <h2>Quick objection handlers</h2>
+    </div>
+    <table class="obj-table">
+      <thead><tr><th>Objection</th><th>Response</th></tr></thead>
+      <tbody>
+        <tr><td>"How much does it cost?"</td><td>Great question — I don't want to give you a rough number without context. My colleague Howard can walk you through what it looks like for your fleet size. Can he give you a quick call?</td></tr>
+        <tr><td>"We're in a contract."</td><td>Totally understand. This isn't about changing anything right now — just making sure you know what's available when the time's right. Can I send you something to keep on file?</td></tr>
+        <tr><td>"We're happy with what we have."</td><td>That's great to hear. I'll leave you to it — if anything changes or an incident comes up, we're here. [Send brochure, log Outcome 2]</td></tr>
+        <tr><td>"Send me an email."</td><td>Absolutely — what's the best email? [Get address, send Vision 3.0 brochure, log Outcome 2]</td></tr>
+        <tr><td>"Not interested."</td><td>No worries at all, appreciate your time. [End call professionally. Log as No Interest.]</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- GOLDEN RULES -->
+  <div id="rules" class="section">
+    <button class="back-btn" onclick="showSection('overview')">← Overview</button>
+    <div class="section-hdr gold">
+      <h2>Golden rules</h2>
+    </div>
+    <ul class="rules-list">
+      <li><span class="ri">🎯</span><div><strong>Lead with the problem, not the product.</strong><br><span>Never open with "we have a dashcam." Open with the gap — what they can't see.</span></div></li>
+      <li><span class="ri">👂</span><div><strong>Listen more than you talk.</strong><br><span>If the customer is talking, you are winning. Do not interrupt.</span></div></li>
+      <li><span class="ri">🔥</span><div><strong>You are warming, not closing.</strong><br><span>Howard closes. Your job is to create curiosity and book the handoff.</span></div></li>
+      <li><span class="ri">📋</span><div><strong>Log every call.</strong><br><span>No call goes unlogged. Even a not-interested is data.</span></div></li>
+      <li><span class="ri">🚫</span><div><strong>Never quote a price.</strong><br><span>Pricing is Howard's conversation. Deflect every single time.</span></div></li>
+    </ul>
+  </div>
+
+  <!-- EMAIL TEMPLATES -->
+  <div id="email" class="section">
+    <button class="back-btn" onclick="showSection('overview')">← Overview</button>
+    <div class="section-hdr">
+      <h2>Email templates</h2>
+    </div>
+
+    <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#6b7280;margin-bottom:10px;">Follow-up email — after sending collateral</p>
+    <div class="email-box">
+      <div class="email-subject">Subject: Linxio Vision 3.0 — as discussed</div>
+      <div class="email-body">
+        <p>Hi [Customer Name],</p>
+        <p>Great chatting with you earlier.</p>
+        <p>Please see our Vision 3.0 dashcam options below.</p>
+        <p>Linxio has over a decade of experience, is based in Australia, and has offices in New Zealand, Dubai, and the US. We work with Hertz, John Holland, BHP and NSW Health — if we can help them, we can find a solution for you.</p>
+        <p>
+          <a href="https://ap1.hubs.ly/y0SDjx0" style="color:#146CE8;">Linxio Vision Lite Dashcam Brochure</a><br>
+          <a href="https://ap1.hubs.ly/y0SDp90" style="color:#146CE8;">Linxio Vision 3.0 AI Dashcam Brochure</a>
+        </p>
+        <p><strong>Both include:</strong><br>
+        ✓ Front + driver-facing camera with night vision<br>
+        ✓ 512GB lockable SD card<br>
+        ✓ Linxio GPS + video platform – 2 in 1 setup (Starter Plan)<br>
+        ✓ Live and historical footage access<br>
+        ✓ Driver behaviour and shock detection<br>
+        ✓ 2-way intercom, SOS button, Wi-Fi<br>
+        ✓ Optus 4G SIM card<br>
+        ✓ Phone app to view footage</p>
+        <p><strong>Vision 3.0 AI also includes:</strong><br>
+        ✓ 1920P road-facing (vs 1080P on Lite)<br>
+        ✓ Up to 6 camera channels (vs 2 on Lite)<br>
+        ✓ AI events — phone use, yawning, harsh driving, speeding<br>
+        ✓ Facial recognition and 6-sec AI clip auto-download<br>
+        ✓ In-cabin audible hazard alerts<br>
+        ✓ 6 months AI cloud storage (vs 0 on Lite)</p>
+        <p>I will reach out shortly to see if you'd like to explore further.</p>
+        <p>[Your Name]<br>Linxio</p>
+      </div>
+    </div>
+
+    <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#6b7280;margin-bottom:10px;margin-top:20px;">Support escalation — when a customer raises an issue</p>
+    <div class="email-box">
+      <div class="email-subject">Subject: [Issue type] | [Company Name] &nbsp;— e.g. "Device offline | Acme Plumbing"</div>
+      <div class="email-body">
+        <p><strong>To:</strong> <a href="mailto:support@linxio.com" style="color:#146CE8;">support@linxio.com</a><br>
+        <strong>CC:</strong> <a href="mailto:howard.wong@linxio.com" style="color:#146CE8;">howard.wong@linxio.com</a></p>
+        <p>State the issue the customer is facing clearly and concisely.</p>
+        <p style="font-size:12px;color:#dc2626;font-weight:600;">Send immediately — do not wait until end of day.</p>
+        <p>Howard will take it from there depending on severity.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const sections = ['overview','step1','step2','step3','objections','rules','email'];
+const navBtns = document.querySelectorAll('.nav-btn');
+
+function showSection(id) {
+  sections.forEach(s => {
+    document.getElementById(s).classList.remove('visible');
+  });
+  navBtns.forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('visible');
+  const idx = sections.indexOf(id);
+  if (idx > -1) navBtns[idx].classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showSubSection(id, branch) {
+  document.querySelectorAll('.sub-section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('act'));
+  document.getElementById(id).classList.add('visible');
+  document.getElementById('btn-' + branch).classList.add('act');
+}
+
+function showBranch(branch) {
+  showSection('step2');
+  const map = { A: 'branchA', B: 'branchB', C: 'branchC' };
+  setTimeout(() => showSubSection(map[branch], branch), 50);
+}
+</script>
+</body>
+</html>
